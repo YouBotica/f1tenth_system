@@ -145,11 +145,26 @@ def generate_launch_description():
                 "init_source_frame_name": "map",
                 "target_frame_name": "odom",
                 "init_tf_pose": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                "updater_topic": '/odom', # "/scanmatching_odom/pose",  # published by slam_toolbox
+                # "updater_topic": '/odom', # "/scanmatching_odom/pose",  # published by slam_toolbox
                 "min_tf_broadcast_frequency": 40.0,  # broadcast tf at >= 40Hz
             },
         ],
     )
+
+    scan_matcher_node = Node(
+        package='yuwei_scan_matching',
+        executable='scan_matcher',
+        name='scan_matcher',
+        output='screen',
+        parameters=[{
+            'use_sim_time': False,
+        }],
+        remappings=[
+            ('/scan', '/scan'),
+            ('/scan_match_location', '/scan_match_pose')
+        ]
+    )
+    
 
     # finalize
     ld.add_action(joy_node)
@@ -161,7 +176,8 @@ def generate_launch_description():
     ld.add_action(urg_node)
     ld.add_action(ackermann_mux_node)
     ld.add_action(static_tf_node)
-    ld.add_action(static_tf_node2)
-    # ld.add_action(odom_tf_node)
+    ld.add_action(scan_matcher_node)
+    # ld.add_action(static_tf_node2)
+    ld.add_action(odom_tf_node)
 
     return ld
